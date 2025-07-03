@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Search Result</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f8fafc;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .result-box {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+      width: 90%;
+      max-width: 500px;
+      text-align: center;
+    }
+
+    h2 {
+      color: #004aad;
+      margin-bottom: 15px;
+    }
+
+    p {
+      font-size: 1rem;
+      color: #333;
+      margin: 10px 0;
+    }
+
+    .back-btn {
+      margin-top: 20px;
+      padding: 10px 16px;
+      background: #004aad;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .back-btn:hover {
+      background-color: #00388a;
+    }
+  </style>
+</head>
+<body>
+  <div class="result-box">
+    <h2>Search Result</h2>
+    <p id="queryText"></p>
+    <p id="timeStamp"></p>
+    <a class="back-btn" href="index.html">🔙 Go Back</a>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const query = params.get("query");
+    const time = params.get("time");
+
+    document.getElementById("queryText").innerHTML = `🔍 You searched for: <strong>${query}</strong>`;
+    document.getElementById("timeStamp").innerHTML = `🕒 Time: <strong>${time}</strong>`;
+  </script>
+</body>
+</html>
