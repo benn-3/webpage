@@ -3,73 +3,170 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Search Viewer</title>
+  <title>Phishing Simulation - Awareness Lab</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background-color: #f0f4f8;
+      background: #f0f4fa;
       display: flex;
       justify-content: center;
-      align-items: center;
+      align-items: flex-start;
       height: 100vh;
+      padding-top: 50px;
     }
 
-    .box {
+    .container {
       background: white;
       padding: 30px;
       border-radius: 10px;
-      box-shadow: 0 6px 15px rgba(0,0,0,0.1);
-      text-align: center;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
       width: 90%;
-      max-width: 400px;
+      max-width: 500px;
     }
 
-    input[type="text"] {
+    h2 {
+      color: #1a73e8;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    input {
       width: 100%;
       padding: 12px;
-      font-size: 16px;
+      margin: 10px 0;
       border: 1px solid #ccc;
       border-radius: 8px;
-      margin-bottom: 15px;
+      font-size: 1rem;
     }
 
     button {
-      padding: 10px 20px;
-      background-color: #004aad;
+      background-color: #1a73e8;
       color: white;
       border: none;
+      padding: 12px;
       border-radius: 8px;
+      font-size: 1rem;
+      width: 100%;
       cursor: pointer;
+      margin-top: 10px;
     }
 
     button:hover {
-      background-color: #003a8c;
+      background-color: #004aad;
     }
 
-    .output {
-      margin-top: 20px;
-      font-size: 1rem;
-      color: #333;
+    .log {
+      margin-top: 30px;
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    .log-entry {
+      border-bottom: 1px solid #ddd;
+      padding: 8px 0;
+    }
+
+    .log-entry:last-child {
+      border-bottom: none;
+    }
+
+    .export-btn {
+      background-color: #28a745;
+    }
+
+    .export-btn:hover {
+      background-color: #1f8734;
     }
   </style>
 </head>
 <body>
-  <div class="box">
-    <h2>Search Anything</h2>
-    <input type="text" id="searchInput" placeholder="Type here..." />
-    <button onclick="displayInput()">Submit</button>
-    <div class="output" id="outputBox"></div>
+  <div class="container">
+    <h2>Login Simulation</h2>
+    <form id="phishForm">
+      <input type="text" id="email" placeholder="Email or username" required />
+      <input type="password" id="password" placeholder="Password" required />
+      <button type="submit">Sign In</button>
+    </form>
+
+    <button class="export-btn" onclick="exportLogs()">⬇️ Export Logs as TXT</button>
+
+    <div class="log" id="logBox">
+      <strong>📝 Captured Logs (Stored in localStorage):</strong>
+      <div id="logEntries"></div>
+    </div>
   </div>
 
   <script>
-    function displayInput() {
-      const query = document.getElementById("searchInput").value.trim();
-      const outputBox = document.getElementById("outputBox");
-      if (query === "") {
-        outputBox.innerHTML = "Please enter something to view.";
-      } else {
-        outputBox.innerHTML = `You entered: <strong>${query}</strong>`;
+    const form = document.getElementById("phishForm");
+    const logEntries = document.getElementById("logEntries");
+
+    window.onload = function () {
+      showLogs();
+    };
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const timestamp = new Date().toLocaleString();
+
+      if (!email || !password) return;
+
+      const entry = {
+        email: email,
+        password: password,
+        time: timestamp
+      };
+
+      let logs = JSON.parse(localStorage.getItem("phishLogs")) || [];
+      logs.push(entry);
+      localStorage.setItem("phishLogs", JSON.stringify(logs));
+
+      form.reset();
+      showLogs();
+    });
+
+    function showLogs() {
+      const logs = JSON.parse(localStorage.getItem("phishLogs")) || [];
+      logEntries.innerHTML = "";
+
+      logs.forEach((entry, index) => {
+        logEntries.innerHTML += `
+          <div class="log-entry">
+            <strong>#${index + 1}</strong><br>
+            📧 <strong>Email:</strong> ${entry.email}<br>
+            🔒 <strong>Password:</strong> ${entry.password}<br>
+            ⏰ <strong>Time:</strong> ${entry.time}
+          </div>
+        `;
+      });
+    }
+
+    function exportLogs() {
+      const logs = JSON.parse(localStorage.getItem("phishLogs")) || [];
+      if (logs.length === 0) {
+        alert("No logs to export.");
+        return;
       }
+
+      let content = "Phishing Awareness Log\n\n";
+      logs.forEach((entry, index) => {
+        content += `#${index + 1}\n`;
+        content += `Email: ${entry.email}\n`;
+        content += `Password: ${entry.password}\n`;
+        content += `Time: ${entry.time}\n\n`;
+      });
+
+      const blob = new Blob([content], { type: "text/plain" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "phishing_logs.txt";
+      link.click();
     }
   </script>
 </body>
